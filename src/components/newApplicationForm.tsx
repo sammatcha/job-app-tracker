@@ -1,13 +1,12 @@
 import { useState } from "react"
 
 interface JobApplication {
- id: number;
     company: string;
     location: string;
     position: string;
     salary: string;
     status: string;
-    appliedDate: string;
+    applied_date: string;
     contact:string;
     notes:string;
 }
@@ -28,13 +27,12 @@ export default function NewAppForm(props:newAppFormProps){
    const handleSubmit = () => {
 
     const newApp = {
-        id: Date.now(),
         company,
         location,
         position,
         salary,
         status,
-        appliedDate: new Date().toLocaleDateString('en'),
+        applied_date: new Date().toLocaleDateString('en'),
         contact,
         notes
     }
@@ -127,7 +125,7 @@ export default function NewAppForm(props:newAppFormProps){
                         {/* buttons */}
                         <div className="w-full mt-5 lg:mt-10 flex rounded gap-3  ">
                             <button
-                            type="submit"
+                            type="button"
                             onClick={handleSubmit}
                             className="bg-blue-500 w-full py-2"
                             >
