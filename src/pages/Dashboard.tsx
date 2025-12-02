@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import NewAppForm from "../components/newApplicationForm";
 import AppDetail from "../components/ApplicationDetail";
 import {supabase} from "../supabaseClient"
+import type {User} from '@supabase/supabase-js'
+import { useNavigate } from 'react-router-dom';
+import Header from "../components/HeaderBar";
 
 interface JobApplication {
     id?:number;
@@ -15,6 +18,7 @@ interface JobApplication {
     notes:string;
 
 }
+
 
 function getStatusColor(status: string){
     switch (status){
@@ -34,13 +38,14 @@ export default function Dashboard(){
     const [showForm, setShowForm] = useState(false)
     const [selectId, setSelectId] = useState<number | null>(null);
     const selectedApp = applications.find(app => app.id === selectId)
+    const [user, setUser]= useState<User | null>(null);
+     const navigate = useNavigate();
 
     const handleShowForm = () => {
         setShowForm(!showForm)
        
     }
     const handleAddApplication = async (newApp: JobApplication) => {
-        console.log("handleAddApplication called", newApp);
        const {data, error} = await supabase
        .from('job_applications')
        .insert([newApp]).select();
@@ -58,6 +63,17 @@ export default function Dashboard(){
     const handleCancel = () => {
        setShowForm(false);
     }
+    const handleLogOut = async () => {
+        const {error} = await supabase.auth.signOut()
+
+        if(error){
+            console.log("error signing out", error.message)
+        }else{
+            console.log("authenticated user", user)
+           navigate('/')
+        }
+    }
+
   useEffect(() => {
     const fetchData = async () => {
         const{data, error} = await supabase
@@ -70,6 +86,7 @@ export default function Dashboard(){
         }
     }
     fetchData(); }, [])
+
     const handleUpdateApplication = async (updatedApp:JobApplication) => {
         setApplications(applications.map((app) => 
             app.id === updatedApp.id ? 
@@ -77,13 +94,24 @@ export default function Dashboard(){
         ))
     }
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            const {data: {user}} = await supabase.auth.getUser()
+            if (!user){
+                console.log("error getting user")
+            }else{
+                 console.log("authenticated user", user)
+                setUser(user)
+            }
+        }
+        fetchUser(); }, [])
+    
+
 
     return(
         <div className="w-full min-h-screen">
            <div className="p-6 max-w-7xl mx-auto space-y-4">
-                <div>
-                    <h1 className="text-xl sm:text-2xl md:text-3xl">Job Applications</h1>
-                </div>
+                {user && <Header user={user} onLogout={handleLogOut} />}
 
                 <div className="border p-3 rounded">
                     {/* create button */}
