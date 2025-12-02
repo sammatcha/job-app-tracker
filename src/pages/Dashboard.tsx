@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NewAppForm from "../components/newApplicationForm";
 import AppDetail from "../components/ApplicationDetail";
+import {supabase} from "../supabaseClient"
 
 interface JobApplication {
-    id: number;
+    id?:number;
     company: string;
     location: string;
     position: string;
     salary: string;
     status: string;
-    appliedDate: string;
+    applied_date: string;
     contact:string;
     notes:string;
 
@@ -38,16 +39,38 @@ export default function Dashboard(){
         setShowForm(!showForm)
        
     }
-    const handleAddApplication = (newApp: JobApplication) => {
-       setApplications([...applications, newApp])
-       setShowForm(false);
+    const handleAddApplication = async (newApp: JobApplication) => {
+        console.log("handleAddApplication called", newApp);
+       const {data, error} = await supabase
+       .from('job_applications')
+       .insert([newApp]).select();
+       if(error){
+        console.log("error inserting db", error.message)
+       }else{
+        setApplications([...applications, data[0]]);
+        setShowForm(false);
+       }
+       
        console.log(newApp)
+       
     }
 
     const handleCancel = () => {
        setShowForm(false);
     }
-    const handleUpdateApplication = (updatedApp:JobApplication) => {
+  useEffect(() => {
+    const fetchData = async () => {
+        const{data, error} = await supabase
+        .from('job_applications').select('*')
+
+        if(error){
+        console.log("error fetching data", error.message)
+        }else{
+            setApplications(data)
+        }
+    }
+    fetchData(); }, [])
+    const handleUpdateApplication = async (updatedApp:JobApplication) => {
         setApplications(applications.map((app) => 
             app.id === updatedApp.id ? 
            updatedApp : app
@@ -92,7 +115,7 @@ export default function Dashboard(){
                             </thead>
                             <tbody className="divide-y divide-gray-300 ">
                                 {applications.map((app)=> (
-                                    <tr onClick={() => setSelectId(app.id)} key={app.id} className="text-slate-900 cursor-pointer hover:bg-gray-50">
+                                    <tr onClick={() => setSelectId(app.id ?? null)} key={app.id} className="text-slate-900 cursor-pointer hover:bg-gray-50">
                                         <td>
                                             <div className="flex flex-col px-6 py-3 rounded">
                                                 <div>{app.company}</div>
@@ -113,7 +136,7 @@ export default function Dashboard(){
                                                 {app.status}
                                             </span>
                                         </td>
-                                        <td>{app.appliedDate}</td>
+                                        <td>{app.applied_date}</td>
                                     </tr>
                                 ))}
                             </tbody>

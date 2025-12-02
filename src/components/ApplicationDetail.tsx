@@ -1,13 +1,13 @@
 import { useState } from "react";
 
 interface JobApplication {
- id: number;
+    id?:number;
     company: string;
     location: string;
     position: string;
     salary: string;
     status: string;
-    appliedDate: string;
+    applied_date: string;
     contact:string;
     notes:string;
 }
@@ -53,13 +53,13 @@ export default function AppDetail(props:jobDetailProps){
         event.preventDefault();
 
         const updatedApp = {
-        id: props.app.id,
+        id: props.app?.id,
         company,
         location,
         position:props.app.position,
         salary,
         status,
-        appliedDate: props.app.appliedDate,
+        applied_date: props.app.applied_date,
         contact,
         notes
        
@@ -107,7 +107,7 @@ export default function AppDetail(props:jobDetailProps){
 
                     <span className="flex flex-col text-slate-900">
                         <p className="text-slate-500 mt-6">Applied</p>
-                        {props.app.appliedDate}
+                        {props.app.applied_date}
                     </span>
 
                     <span className="flex flex-col text-slate-900">
