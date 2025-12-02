@@ -8,6 +8,8 @@ interface JobApplication {
     salary: string;
     status: string;
     appliedDate: string;
+    contact:string;
+    notes:string;
 }
 interface newAppFormProps {
     onSubmit: (newApp:JobApplication) => void
@@ -20,6 +22,8 @@ export default function NewAppForm(props:newAppFormProps){
     const [position, setPosition] = useState("");
     const [salary, setSalary] = useState("");
     const [status, setStatus] = useState("Applied");
+    const [contact, setContact] = useState("");
+    const [notes, setNotes] = useState("");
 
    const handleSubmit = () => {
 
@@ -30,7 +34,9 @@ export default function NewAppForm(props:newAppFormProps){
         position,
         salary,
         status,
-        appliedDate: new Date().toLocaleDateString('en')
+        appliedDate: new Date().toLocaleDateString('en'),
+        contact,
+        notes
     }
     props.onSubmit(newApp);
     console.log(newApp)
@@ -85,6 +91,25 @@ export default function NewAppForm(props:newAppFormProps){
                         onChange={(e) => setSalary(e.target.value)}
                         className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1  focus:ring-2 focus:border-blue-600 "
                          />
+                    </div>
+                    <div className="">
+                        <label className="text-slate-900">Contact Person</label>
+                         <input
+                        name="contact"
+                        type="contact"
+                        onChange={(e) => setContact(e.target.value)}
+                        className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1  focus:ring-2 focus:border-blue-600 "
+                         />
+                    </div>
+                    <div className="">
+                        <label className="text-slate-900">Notes</label>
+                         <input
+                        name="notes"
+                        type="notes"
+                        onChange={(e) => setNotes(e.target.value)}
+                        className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1  focus:ring-2 focus:border-blue-600 "
+                         />
+                    
                     </div>
                     <div className="">
                         <label className="text-slate-900">Status</label>
