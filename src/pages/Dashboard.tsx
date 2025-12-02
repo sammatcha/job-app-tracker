@@ -1,5 +1,6 @@
 import { useState } from "react";
 import NewAppForm from "../components/newApplicationForm";
+import AppDetail from "../components/ApplicationDetail";
 
 interface JobApplication {
     id: number;
@@ -9,6 +10,8 @@ interface JobApplication {
     salary: string;
     status: string;
     appliedDate: string;
+    contact:string;
+    notes:string;
 
 }
 
@@ -28,6 +31,8 @@ function getStatusColor(status: string){
 export default function Dashboard(){
     const [applications, setApplications] = useState<JobApplication[]>([])
     const [showForm, setShowForm] = useState(false)
+    const [selectId, setSelectId] = useState<number | null>(null);
+    const selectedApp = applications.find(app => app.id === selectId)
 
     const handleShowForm = () => {
         setShowForm(!showForm)
@@ -42,6 +47,13 @@ export default function Dashboard(){
     const handleCancel = () => {
        setShowForm(false);
     }
+    const handleUpdateApplication = (updatedApp:JobApplication) => {
+        setApplications(applications.map((app) => 
+            app.id === updatedApp.id ? 
+           updatedApp : app
+        ))
+    }
+
 
     return(
         <div className="w-full min-h-screen">
@@ -56,7 +68,7 @@ export default function Dashboard(){
                         <input className="w-full border bg-white border-gray-200 rounded">
                         </input>
                         <button onClick={handleShowForm}  
-                            className="border  bg-blue-500 whitespace-nowrap px-2 py-1 "
+                            className="border bg-blue-500 whitespace-nowrap px-2 py-1 "
                         >   
                             + New Application
                         </button>
@@ -64,7 +76,7 @@ export default function Dashboard(){
                     </div>
                 </div>
                         {showForm && <NewAppForm onSubmit={handleAddApplication} onCancel={handleCancel}/>}
-
+                        {selectedApp && <AppDetail onSave={handleUpdateApplication} app={selectedApp} onCancel={() => setSelectId(null)} />}
                 {/* Table  */}
                 <div>
                     <div>
@@ -80,7 +92,7 @@ export default function Dashboard(){
                             </thead>
                             <tbody className="divide-y divide-gray-300 ">
                                 {applications.map((app)=> (
-                                    <tr key={app.id} className="text-slate-900">
+                                    <tr onClick={() => setSelectId(app.id)} key={app.id} className="text-slate-900 cursor-pointer hover:bg-gray-50">
                                         <td>
                                             <div className="flex flex-col px-6 py-3 rounded">
                                                 <div>{app.company}</div>
@@ -100,8 +112,6 @@ export default function Dashboard(){
                                             <span className={`px-3 py-2 rounded-full ${getStatusColor(app.status)}`}>
                                                 {app.status}
                                             </span>
-                                            
-                                            
                                         </td>
                                         <td>{app.appliedDate}</td>
                                     </tr>
