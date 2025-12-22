@@ -19,7 +19,6 @@ interface JobApplication {
 
 }
 
-
 function getStatusColor(status: string){
     switch (status){
         case 'Applied':
@@ -29,8 +28,7 @@ function getStatusColor(status: string){
             case 'Offer':
                 return "bg-green-300"
             case 'Rejected':
-                return "bg-red-300"
-            
+                return "bg-red-300"      
     }
 }
 export default function Dashboard(){
@@ -55,9 +53,6 @@ export default function Dashboard(){
         setApplications([...applications, data[0]]);
         setShowForm(false);
        }
-       
-       console.log(newApp)
-       
     }
 
     const handleCancel = () => {
@@ -149,7 +144,6 @@ export default function Dashboard(){
                                                 <div>{app.company}</div>
                                                 <div className="text-gray-600">{app.location}</div>
                                             </div>
-                                            
                                         </td>
                                         <td>
                                             <div className="flex flex-col">
