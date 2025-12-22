@@ -8,3 +8,5 @@ Run dev server<br>
 `
 npm run dev
 `
+### Login
+Admin credentials available for demo
