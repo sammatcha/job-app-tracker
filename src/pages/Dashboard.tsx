@@ -16,7 +16,6 @@ interface JobApplication {
     applied_date: string;
     contact:string;
     notes:string;
-
 }
 
 function getStatusColor(status: string){
@@ -35,7 +34,7 @@ export default function Dashboard(){
     const [applications, setApplications] = useState<JobApplication[]>([])
     const [showForm, setShowForm] = useState(false)
     const [selectId, setSelectId] = useState<number | null>(null);
-    const selectedApp = applications.find(app => app.id === selectId)
+    const selectedApp = applications.find((app)=> app?.id === selectId)
     const [user, setUser]= useState<User | null>(null);
      const navigate = useNavigate();
 
@@ -83,10 +82,28 @@ export default function Dashboard(){
     fetchData(); }, [])
 
     const handleUpdateApplication = async (updatedApp:JobApplication) => {
-        setApplications(applications.map((app) => 
-            app.id === updatedApp.id ? 
-           updatedApp : app
-        ))
+        const {id , ...updatedFields} = updatedApp;
+        console.log("id being sent:", id);
+        console.log("id being sent:", id, typeof id);
+        console.log("updatedFields:", updatedFields);
+
+        const {data, error} = await supabase
+        .from('job_applications')
+        .update(updatedFields)
+        .eq('id', id)
+        .select()
+    
+        if(error){
+            console.log("error updating application", error.message)
+            return;
+        }
+        if(data && data.length > 0) {
+            setApplications((prev) => prev.map((app) =>app?.id === updatedApp.id ? data[0]:app)
+        );
+        console.log("updated application")
+        }else{
+            console.log("no data returned")
+        }
     }
 
     useEffect(() => {
@@ -100,8 +117,6 @@ export default function Dashboard(){
             }
         }
         fetchUser(); }, [])
-    
-
 
     return(
         <div className="w-full min-h-screen">
@@ -137,28 +152,30 @@ export default function Dashboard(){
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-300 ">
-                                {applications.map((app)=> (
-                                    <tr onClick={() => setSelectId(app.id ?? null)} key={app.id} className="text-slate-900 cursor-pointer hover:bg-gray-50">
+                                {applications
+                                .filter((app): app is JobApplication => app !== null)
+                                .map((app )=> (
+                                    <tr onClick={() => setSelectId(app?.id ?? null)} key={app?.id} className="text-slate-900 cursor-pointer hover:bg-gray-50">
                                         <td>
                                             <div className="flex flex-col px-6 py-3 rounded">
-                                                <div>{app.company}</div>
-                                                <div className="text-gray-600">{app.location}</div>
+                                                <div>{app?.company}</div>
+                                                <div className="text-gray-600">{app?.location}</div>
                                             </div>
                                         </td>
                                         <td>
                                             <div className="flex flex-col">
-                                                <div>{app.position}</div>
-                                                <div className="text-gray-600">{app.salary}</div>
+                                                <div>{app?.position}</div>
+                                                <div className="text-gray-600">{app?.salary}</div>
                                             </div>
                                             
                                         </td>
                                         
                                         <td>
-                                            <span className={`px-3 py-2 rounded-full ${getStatusColor(app.status)}`}>
-                                                {app.status}
+                                            <span className={`px-3 py-2 rounded-full ${getStatusColor(app?.status)}`}>
+                                                {app?.status}
                                             </span>
                                         </td>
-                                        <td>{app.applied_date}</td>
+                                        <td>{app?.applied_date}</td>
                                     </tr>
                                 ))}
                             </tbody>

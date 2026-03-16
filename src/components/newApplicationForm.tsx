@@ -17,6 +17,7 @@ interface newAppFormProps {
 
 export default function NewAppForm(props:newAppFormProps){
     const [company, setCompany] = useState("");
+    const [appliedDate, setAppliedDate] = useState("");
     const [location, setLocation] = useState("");
     const [position, setPosition] = useState("");
     const [salary, setSalary] = useState("");
@@ -32,7 +33,7 @@ export default function NewAppForm(props:newAppFormProps){
         position,
         salary,
         status,
-        applied_date: new Date().toLocaleDateString('en'),
+        applied_date:appliedDate,
         contact,
         notes
     }
@@ -47,7 +48,7 @@ export default function NewAppForm(props:newAppFormProps){
     
    }
     return(
-        <div className="border p-10 fixed inset-0 bg-black/50 z-50">
+        <div className="border p-10 fixed overflow-y-auto inset-0 bg-black/50 z-50">
             <div className="min-w-lg md:max-w-lg bg-white mx-4 p-8 rounded-lg w-full">
                 {/* Header */}
                 <div>
@@ -60,6 +61,15 @@ export default function NewAppForm(props:newAppFormProps){
                         name="text"
                         type="company"
                         onChange={(e) => setCompany(e.target.value)}
+                        className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1 focus:ring-2 focus:border-blue-600 "
+                        />
+                    </div>
+                    <div>
+                        <label className="text-slate-900 text-lg">Date Applied</label>
+                        <input
+                        value={appliedDate}
+                        type="date"
+                        onChange={(e) => setAppliedDate(e.target.value)}
                         className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1 focus:ring-2 focus:border-blue-600 "
                         />
                     </div>
@@ -101,9 +111,8 @@ export default function NewAppForm(props:newAppFormProps){
                     </div>
                     <div className="">
                         <label className="text-slate-900">Notes</label>
-                         <input
+                         <textarea
                         name="notes"
-                        type="notes"
                         onChange={(e) => setNotes(e.target.value)}
                         className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1  focus:ring-2 focus:border-blue-600 "
                          />
