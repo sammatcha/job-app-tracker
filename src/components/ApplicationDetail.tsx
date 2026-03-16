@@ -43,6 +43,7 @@ export default function AppDetail(props:jobDetailProps){
         setIsEdit(!isEdit)
    }
     const [company, setCompany] = useState(props.app.company || "");
+    const [appliedDate, setAppliedDate] = useState(props.app.applied_date || "");
     const [location, setLocation] = useState(props.app.location || "");
     const [salary, setSalary] = useState(props.app.salary || "");
     const [status, setStatus] = useState(props.app.status || "Applied");
@@ -59,7 +60,7 @@ export default function AppDetail(props:jobDetailProps){
         position:props.app.position,
         salary,
         status,
-        applied_date: props.app.applied_date,
+        applied_date : appliedDate || props.app.applied_date,
         contact,
         notes
        
@@ -69,7 +70,7 @@ export default function AppDetail(props:jobDetailProps){
     }
 
     return(
-        <div className="border p-10 fixed inset-0 bg-black/50 z-50">
+        <div className="border p-10 fixed inset-0 overflow-y-auto bg-black/50 z-50">
             <div className="min-w-lg md:max-w-lg bg-white mx-4 p-10 lg:p-12 rounded-lg w-full text-slate-900 ">
                 
 
@@ -107,7 +108,9 @@ export default function AppDetail(props:jobDetailProps){
 
                     <span className="flex flex-col text-slate-900">
                         <p className="text-slate-500 mt-6">Applied</p>
-                        {props.app.applied_date}
+                       {isEdit ? <input value={appliedDate} onChange={(e) => setAppliedDate(e.target.value)} />
+                        :<p>{props.app.applied_date}</p>
+            }       
                     </span>
 
                     <span className="flex flex-col text-slate-900">
