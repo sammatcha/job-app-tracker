@@ -9,6 +9,7 @@ interface JobApplication {
     status: string;
     applied_date: string;
     contact:string;
+    referral: string;
     notes:string;
 }
 interface jobDetailProps {
@@ -48,6 +49,7 @@ export default function AppDetail(props:jobDetailProps){
     const [salary, setSalary] = useState(props.app.salary || "");
     const [status, setStatus] = useState(props.app.status || "Applied");
     const [contact, setContact] = useState(props.app.contact || "");
+    const [referral, setReferral] = useState(props.app.referral || "");
     const [notes, setNotes] = useState(props.app.notes || "");
 
     const handleSave = (event:React.MouseEvent<HTMLButtonElement>) => {
@@ -62,6 +64,7 @@ export default function AppDetail(props:jobDetailProps){
         status,
         applied_date : appliedDate || props.app.applied_date,
         contact,
+        referral,
         notes
        
 }
@@ -114,10 +117,16 @@ export default function AppDetail(props:jobDetailProps){
                     </span>
 
                     <span className="flex flex-col text-slate-900">
-                        <p className="text-slate-500 mt-6">Contact Person</p>
-                        {isEdit ? <input value={contact} onChange={(e)=> setContact(e.target.value)} className="px-3 py-2 "/>
-                        : <p>{props.app.contact}</p>
-                    }
+                            <p className="text-slate-500 mt-6">Contact Person</p>
+                            {isEdit ? <input value={contact} onChange={(e)=> setContact(e.target.value)} className="px-3 py-2 "/>
+                            : <p>{props.app.contact}</p>
+                        }
+                    </span>
+                    <span className="flex flex-col text-slate-900">
+                        <p className="text-slate-500 mt-6">Referral</p>
+                        {isEdit ? <input value={referral} onChange={(e) => setReferral(e.target.value)} />
+                        : <p>{props.app.referral}</p>
+                        }
                     </span>
                     <span className="flex flex-col text-slate-900 ">
                         <p className="text-slate-500 mt-6 ">Notes</p>

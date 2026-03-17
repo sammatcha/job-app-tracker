@@ -8,6 +8,7 @@ interface JobApplication {
     status: string;
     applied_date: string;
     contact:string;
+    referral: string;
     notes:string;
 }
 interface newAppFormProps {
@@ -23,11 +24,12 @@ export default function NewAppForm(props:newAppFormProps){
     const [salary, setSalary] = useState("");
     const [status, setStatus] = useState("Applied");
     const [contact, setContact] = useState("");
+    const [referral, setReferral] = useState("");
     const [notes, setNotes] = useState("");
 
    const handleSubmit = () => {
 
-    const newApp = {
+    const newApp: JobApplication = {
         company,
         location,
         position,
@@ -35,6 +37,7 @@ export default function NewAppForm(props:newAppFormProps){
         status,
         applied_date:appliedDate,
         contact,
+        referral,
         notes
     }
     props.onSubmit(newApp);
@@ -106,6 +109,15 @@ export default function NewAppForm(props:newAppFormProps){
                         name="contact"
                         type="contact"
                         onChange={(e) => setContact(e.target.value)}
+                        className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1  focus:ring-2 focus:border-blue-600 "
+                         />
+                    </div>
+                    <div className="">
+                        <label className="text-slate-900">Referral</label>
+                         <input
+                        value={referral}
+                        type="referral"
+                        onChange={(e) => setReferral(e.target.value)}
                         className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1  focus:ring-2 focus:border-blue-600 "
                          />
                     </div>

@@ -5,6 +5,7 @@ import {supabase} from "../supabaseClient"
 import type {User} from '@supabase/supabase-js'
 import { useNavigate } from 'react-router-dom';
 import Header from "../components/HeaderBar";
+import DashboardAnalytics from "../components/DashboardAnalytics";
 
 interface JobApplication {
     id?:number;
@@ -15,6 +16,7 @@ interface JobApplication {
     status: string;
     applied_date: string;
     contact:string;
+    referral: string;
     notes:string;
 }
 
@@ -83,7 +85,6 @@ export default function Dashboard(){
 
     const handleUpdateApplication = async (updatedApp:JobApplication) => {
         const {id , ...updatedFields} = updatedApp;
-        console.log("id being sent:", id);
         console.log("id being sent:", id, typeof id);
         console.log("updatedFields:", updatedFields);
 
@@ -139,6 +140,7 @@ export default function Dashboard(){
                         {showForm && <NewAppForm onSubmit={handleAddApplication} onCancel={handleCancel}/>}
                         {selectedApp && <AppDetail onSave={handleUpdateApplication} app={selectedApp} onCancel={() => setSelectId(null)} />}
                 {/* Table  */}
+                <DashboardAnalytics applications={applications}/>
                 <div>
                     <div>
                         <table className="w-full border border-gray-300 ">
@@ -147,6 +149,7 @@ export default function Dashboard(){
                                     <th className="p-3">Company</th>
                                     <th>Position</th>
                                     <th>Status</th>
+                                    <th>Referral</th>
                                     <th>Applied</th>
                                    
                                 </tr>
@@ -175,6 +178,13 @@ export default function Dashboard(){
                                                 {app?.status}
                                             </span>
                                         </td>
+
+                                            <td>
+                                                <span>
+                                                    {app?.referral?.trim() ? "Yes": "No"}
+                                                </span>
+                                            </td>   
+
                                         <td>{app?.applied_date}</td>
                                     </tr>
                                 ))}
