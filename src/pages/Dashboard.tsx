@@ -65,7 +65,7 @@ export default function Dashboard(){
         if(error){
             console.log("error signing out", error.message)
         }else{
-            console.log("authenticated user", user)
+            // console.log("authenticated user", user)
            navigate('/')
         }
     }
@@ -85,8 +85,8 @@ export default function Dashboard(){
 
     const handleUpdateApplication = async (updatedApp:JobApplication) => {
         const {id , ...updatedFields} = updatedApp;
-        console.log("id being sent:", id, typeof id);
-        console.log("updatedFields:", updatedFields);
+        // console.log("id being sent:", id, typeof id);
+        // console.log("updatedFields:", updatedFields);
 
         const {data, error} = await supabase
         .from('job_applications')
@@ -113,7 +113,7 @@ export default function Dashboard(){
             if (!user){
                 console.log("error getting user")
             }else{
-                 console.log("authenticated user", user)
+                //  console.log("authenticated user", user)
                 setUser(user)
             }
         }
