@@ -19,6 +19,13 @@ interface JobApplication {
     referral: string;
     notes:string;
 }
+interface StatusHistory {
+    id?:number;
+    application_id: number;
+    status: string;
+    changed_at: string;
+    user_id: string;
+}
 
 function getStatusColor(status: string){
     switch (status){
@@ -38,11 +45,11 @@ export default function Dashboard(){
     const [selectId, setSelectId] = useState<number | null>(null);
     const selectedApp = applications.find((app)=> app?.id === selectId)
     const [user, setUser]= useState<User | null>(null);
+    const [statusHistory, setStatusHistory] = useState<StatusHistory[]>([]);
      const navigate = useNavigate();
 
     const handleShowForm = () => {
         setShowForm(!showForm)
-       
     }
     const handleAddApplication = async (newApp: JobApplication) => {
        const {data, error} = await supabase
@@ -74,20 +81,27 @@ export default function Dashboard(){
     const fetchData = async () => {
         const{data, error} = await supabase
         .from('job_applications').select('*')
-
+        
         if(error){
         console.log("error fetching data", error.message)
         }else{
             setApplications(data)
+        }
+
+        const {data: historyData, error: historyError} = await supabase
+        .from('application_status_history')
+        .select('*')
+        
+        if(historyError){
+            console.log("error fetching history", historyError.message)
+        }else{
+            setStatusHistory(historyData)
         }
     }
     fetchData(); }, [])
 
     const handleUpdateApplication = async (updatedApp:JobApplication) => {
         const {id , ...updatedFields} = updatedApp;
-        // console.log("id being sent:", id, typeof id);
-        // console.log("updatedFields:", updatedFields);
-
         const {data, error} = await supabase
         .from('job_applications')
         .update(updatedFields)
@@ -99,9 +113,28 @@ export default function Dashboard(){
             return;
         }
         if(data && data.length > 0) {
+            const currentApp = applications.find((app) => app?.id === id);
             setApplications((prev) => prev.map((app) =>app?.id === updatedApp.id ? data[0]:app)
         );
-        console.log("updated application")
+        
+        if(updatedFields.status && currentApp?.status !== updatedFields.status){
+            const {error:historyError} = await supabase
+            .from('application_status_history')
+            .insert({
+                application_id: id,
+                status: updatedFields.status,
+                user_id: user?.id
+            })
+            if (historyError) console.log("error inserting history", historyError.message)
+            if (!historyError){
+                setStatusHistory(prev => [...prev, {
+                    application_id: id!,
+                    status: updatedFields.status,
+                    user_id: user?.id ?? "",
+                    changed_at: new Date().toISOString()
+                }])
+            }
+        }
         }else{
             console.log("no data returned")
         }
@@ -113,7 +146,6 @@ export default function Dashboard(){
             if (!user){
                 console.log("error getting user")
             }else{
-                //  console.log("authenticated user", user)
                 setUser(user)
             }
         }
@@ -140,7 +172,7 @@ export default function Dashboard(){
                         {showForm && <NewAppForm onSubmit={handleAddApplication} onCancel={handleCancel}/>}
                         {selectedApp && <AppDetail onSave={handleUpdateApplication} app={selectedApp} onCancel={() => setSelectId(null)} />}
                 {/* Table  */}
-                <DashboardAnalytics applications={applications}/>
+                <DashboardAnalytics applications={applications} statusHistory={statusHistory} />
                 <div>
                     <div>
                         <table className="w-full border border-gray-300 ">

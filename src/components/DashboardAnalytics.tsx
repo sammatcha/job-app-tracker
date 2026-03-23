@@ -5,21 +5,29 @@ interface JobApplication {
     applied_date: string;
     referral: string;
 }
+interface StatusHistory {
+    application_id:number,
+    status: string,
+    user_id: string,
+    changed_at: string
+}
 
 interface DashboardAnalyticsProps {
     applications: JobApplication[]
+    statusHistory: StatusHistory[]
 }
 
-export default function DashboardAnalytics({ applications}: DashboardAnalyticsProps){
+export default function DashboardAnalytics({ applications, statusHistory}: DashboardAnalyticsProps) {
     const totalApps = applications.length;
     const applied = applications.filter(a => a.status === "Applied").length;
     const rejected = applications.filter(a => a.status === "Rejected").length;
-    const interviews = applications.filter(a => a.status === "Interview").length;
-    const offers = applications.filter(a => a.status === "Offer").length;
     const responseCount = applications.filter(a => a.status !== "Applied").length;
+    const interviews = new Set(statusHistory.filter(s => s.status === "Interview").map(s => s.application_id)).size;
+    const offers = new Set(statusHistory.filter(s => s.status === "Offer").map(s => s.application_id)).size;
+    const responseRate = toPercent(responseCount , totalApps);
     const interviewRate = toPercent(interviews, totalApps);
     const offerRate = toPercent(offers, totalApps);
-    const responseRate = toPercent(responseCount , totalApps);
+
 
     const stats = [
         {label:"Total Applications", value: totalApps},
@@ -63,11 +71,7 @@ export default function DashboardAnalytics({ applications}: DashboardAnalyticsPr
                                 <div className={`${stage.color} h-2 rounded `} style={{width:`${stage.count / Math.max(1,applied)*100}%`}}></div>
                             </div>
                             </div>
-                            
-                           
-                           
-                       
-                        
+   
                     )
                 })}
                 </div>
