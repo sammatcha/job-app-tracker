@@ -4,6 +4,7 @@ interface JobApplication {
     status: string;
     applied_date: string;
     referral: string;
+    id? : number;
 }
 interface StatusHistory {
     application_id:number,
@@ -17,6 +18,25 @@ interface DashboardAnalyticsProps {
     statusHistory: StatusHistory[]
 }
 
+const getRejectedStageBreakdown = (rejectedIds: number[] , statusHistory: StatusHistory[]) => {
+   let rejectedAfterApplied = 0;
+   let rejectedAfterInterview = 0;
+
+   for(let id of rejectedIds){
+    const history = statusHistory.filter(s => s.application_id === id);
+    console.log("history for app", id, history)
+
+    if(history.some(s => s.status === "Interview")){
+        rejectedAfterInterview++;
+        console.log("rejected after interview", id)
+    }else{history.some(s=>s.status === "Applied") 
+        rejectedAfterApplied++;
+        console.log("rejected after applied", id)
+    }
+   }
+   return { rejectedAfterApplied, rejectedAfterInterview };
+}
+
 export default function DashboardAnalytics({ applications, statusHistory}: DashboardAnalyticsProps) {
     const totalApps = applications.length;
     const applied = applications.filter(a => a.status === "Applied").length;
@@ -27,6 +47,12 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
     const responseRate = toPercent(responseCount , totalApps);
     const interviewRate = toPercent(interviews, totalApps);
     const offerRate = toPercent(offers, totalApps);
+    const rejectedApps = applications.filter(a => a.status === "Rejected");
+    const rejectedIds = rejectedApps
+    .map((a) => a.id)
+    .filter((id): id is number => id !== undefined);
+
+    const rejectedStageBreakdown = getRejectedStageBreakdown(rejectedIds, statusHistory);
 
 
     const stats = [
@@ -35,6 +61,7 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
         {label: "Interview Rate", value: interviewRate},
         {label: "Offer Rate", value: offerRate}
     ]
+
     const funnelStages = [
         {label: "Applied", count: applied , color: "bg-purple-500"},
         {label: "Interview", count: interviews, color: "bg-blue-500"},
@@ -55,9 +82,9 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
                     )
                 })}
             </div>
-            <div>
+            <div className="flex w-full gap-5 mt-5">
                 {/* funnel chart */}
-                <div className="max-w-lg mt-3 bg-white rounded p-5 pb-5 mb-5">
+                <div className="w-1/2 mt-3 bg-white rounded p-5 pb-5 mb-5">
                     <p className="text-neutral-950 font-bold mb-4">Pipeline Overview</p>
                     {funnelStages.map((stage, index) => {
                     return(
@@ -74,6 +101,22 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
    
                     )
                 })}
+                </div>
+                {/* breakdown of rejected applications */}
+                <div className="w-1/2 mt-3 bg-white rounded p-5 pb-5 mb-5">
+                    <p className="text-neutral-950 font-bold mb-4 text-center">Rejected Applications Breakdown</p>
+                        <div className="flex justify-between gap-2">
+                            <p className="text-stone-600">Rejected after Applied</p>
+                            <p className="text-stone-600">{rejectedStageBreakdown.rejectedAfterApplied }</p>
+
+                        </div>
+                        <div className="flex justify-between gap-2">
+                            <p className="text-stone-600">Rejected after Interview</p>
+                            <p className="text-stone-600">{rejectedStageBreakdown.rejectedAfterInterview}</p>
+                           
+                        </div>
+                               
+               
                 </div>
             </div>
         </div>
