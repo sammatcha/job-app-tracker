@@ -4,6 +4,7 @@ interface JobApplication {
     status: string;
     applied_date: string;
     referral: string;
+    id? : number;
 }
 interface StatusHistory {
     application_id:number,
@@ -17,6 +18,22 @@ interface DashboardAnalyticsProps {
     statusHistory: StatusHistory[]
 }
 
+const getRejectedStageBreakdown = (rejectedIds: number[] , statusHistory: StatusHistory[]) => {
+   let rejectedAfterApplied = 0;
+   let rejectedAfterInterview = 0;
+
+   for(let id of rejectedIds){
+    const history = statusHistory.filter(s => s.application_id === id);
+
+    if(history.some(s => s.status === "Interview")){
+        rejectedAfterInterview++;
+    } else {
+        rejectedAfterApplied++;   
+    }
+   }
+   return { rejectedAfterApplied, rejectedAfterInterview };
+}
+
 export default function DashboardAnalytics({ applications, statusHistory}: DashboardAnalyticsProps) {
     const totalApps = applications.length;
     const applied = applications.filter(a => a.status === "Applied").length;
@@ -27,6 +44,12 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
     const responseRate = toPercent(responseCount , totalApps);
     const interviewRate = toPercent(interviews, totalApps);
     const offerRate = toPercent(offers, totalApps);
+    const rejectedApps = applications.filter(a => a.status === "Rejected");
+    const rejectedIds = rejectedApps
+    .map((a) => a.id)
+    .filter((id): id is number => id !== undefined);
+
+    const rejectedStageBreakdown = getRejectedStageBreakdown(rejectedIds, statusHistory);
 
 
     const stats = [
@@ -35,13 +58,16 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
         {label: "Interview Rate", value: interviewRate},
         {label: "Offer Rate", value: offerRate}
     ]
+
     const funnelStages = [
         {label: "Applied", count: applied , color: "bg-purple-500"},
         {label: "Interview", count: interviews, color: "bg-blue-500"},
         {label: "Offer", count: offers, color: "bg-green-500"},
         {label: "Rejected", count: rejected, color: "bg-red-500"},
     ]
-
+    const barWidthPercent = (count:number) => 
+        Math.min(100, (count/ Math.max(1, applied)) * 100)
+    
     return(
         <div className="w-full ">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -55,9 +81,9 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
                     )
                 })}
             </div>
-            <div>
+            <div className="flex w-full gap-5 mt-5">
                 {/* funnel chart */}
-                <div className="max-w-lg mt-3 bg-white rounded p-5 pb-5 mb-5">
+                <div className="w-full max-w-med mt-3 bg-white rounded p-5 pb-5 mb-5">
                     <p className="text-neutral-950 font-bold mb-4">Pipeline Overview</p>
                     {funnelStages.map((stage, index) => {
                     return(
@@ -68,12 +94,28 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
                                 </div>
 
                                 <div  className="w-full h-2 bg-gray-100 rounded mb-3" >
-                                <div className={`${stage.color} h-2 rounded `} style={{width:`${stage.count / Math.max(1,applied)*100}%`}}></div>
+                                <div className={`${stage.color} h-2 max-w-full rounded `} style={{width:`${barWidthPercent(stage.count)}%`}}></div>
                             </div>
                             </div>
    
                     )
                 })}
+                </div>
+                {/* breakdown of rejected applications */}
+                <div className="w-full max-w-med mt-3 bg-white rounded p-5 pb-5 mb-5">
+                    <p className="text-neutral-950 font-bold mb-4 text-center">Rejected Applications Breakdown</p>
+                        <div className="flex justify-between gap-2">
+                            <p className="text-stone-600">Rejected after Applied</p>
+                            <p className="text-stone-600">{rejectedStageBreakdown.rejectedAfterApplied }</p>
+
+                        </div>
+                        <div className="flex justify-between gap-2">
+                            <p className="text-stone-600">Rejected after Interview</p>
+                            <p className="text-stone-600">{rejectedStageBreakdown.rejectedAfterInterview}</p>
+                           
+                        </div>
+                               
+               
                 </div>
             </div>
         </div>
