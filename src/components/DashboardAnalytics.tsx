@@ -24,14 +24,11 @@ const getRejectedStageBreakdown = (rejectedIds: number[] , statusHistory: Status
 
    for(let id of rejectedIds){
     const history = statusHistory.filter(s => s.application_id === id);
-    console.log("history for app", id, history)
 
     if(history.some(s => s.status === "Interview")){
         rejectedAfterInterview++;
-        console.log("rejected after interview", id)
-    }else{history.some(s=>s.status === "Applied") 
-        rejectedAfterApplied++;
-        console.log("rejected after applied", id)
+    } else {
+        rejectedAfterApplied++;   
     }
    }
    return { rejectedAfterApplied, rejectedAfterInterview };
@@ -68,7 +65,9 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
         {label: "Offer", count: offers, color: "bg-green-500"},
         {label: "Rejected", count: rejected, color: "bg-red-500"},
     ]
-
+    const barWidthPercent = (count:number) => 
+        Math.min(100, (count/ Math.max(1, applied)) * 100)
+    
     return(
         <div className="w-full ">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -84,7 +83,7 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
             </div>
             <div className="flex w-full gap-5 mt-5">
                 {/* funnel chart */}
-                <div className="w-1/2 mt-3 bg-white rounded p-5 pb-5 mb-5">
+                <div className="w-full max-w-med mt-3 bg-white rounded p-5 pb-5 mb-5">
                     <p className="text-neutral-950 font-bold mb-4">Pipeline Overview</p>
                     {funnelStages.map((stage, index) => {
                     return(
@@ -95,7 +94,7 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
                                 </div>
 
                                 <div  className="w-full h-2 bg-gray-100 rounded mb-3" >
-                                <div className={`${stage.color} h-2 rounded `} style={{width:`${stage.count / Math.max(1,applied)*100}%`}}></div>
+                                <div className={`${stage.color} h-2 max-w-full rounded `} style={{width:`${barWidthPercent(stage.count)}%`}}></div>
                             </div>
                             </div>
    
@@ -103,7 +102,7 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
                 })}
                 </div>
                 {/* breakdown of rejected applications */}
-                <div className="w-1/2 mt-3 bg-white rounded p-5 pb-5 mb-5">
+                <div className="w-full max-w-med mt-3 bg-white rounded p-5 pb-5 mb-5">
                     <p className="text-neutral-950 font-bold mb-4 text-center">Rejected Applications Breakdown</p>
                         <div className="flex justify-between gap-2">
                             <p className="text-stone-600">Rejected after Applied</p>
