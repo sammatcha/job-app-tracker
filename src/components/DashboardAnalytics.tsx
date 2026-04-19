@@ -5,6 +5,7 @@ interface JobApplication {
     applied_date: string;
     referral: string;
     id? : number;
+    rejection_interview_stage?: string | null;
 }
 interface StatusHistory {
     application_id:number,
@@ -18,20 +19,26 @@ interface DashboardAnalyticsProps {
     statusHistory: StatusHistory[]
 }
 
-const getRejectedStageBreakdown = (rejectedIds: number[] , statusHistory: StatusHistory[]) => {
+const getRejectedStageBreakdown = (rejectedIds: number[] , statusHistory: StatusHistory[], rejectedApps: JobApplication[]) => {
    let rejectedAfterApplied = 0;
    let rejectedAfterInterview = 0;
+   const byInterviewStage: Record<string, number> = {};
 
    for(let id of rejectedIds){
     const history = statusHistory.filter(s => s.application_id === id);
 
     if(history.some(s => s.status === "Interview")){
         rejectedAfterInterview++;
+        const app = rejectedApps.find(app => app.id === id);
+        const stage = app?.rejection_interview_stage || "Unknown";
+        byInterviewStage[stage]= (byInterviewStage[stage] || 0) + 1;
     } else {
         rejectedAfterApplied++;   
     }
+    
+    
    }
-   return { rejectedAfterApplied, rejectedAfterInterview };
+   return { rejectedAfterApplied, rejectedAfterInterview, byInterviewStage };
 }
 
 export default function DashboardAnalytics({ applications, statusHistory}: DashboardAnalyticsProps) {
@@ -49,7 +56,7 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
     .map((a) => a.id)
     .filter((id): id is number => id !== undefined);
 
-    const rejectedStageBreakdown = getRejectedStageBreakdown(rejectedIds, statusHistory);
+    const rejectedStageBreakdown = getRejectedStageBreakdown(rejectedIds, statusHistory, rejectedApps);
 
 
     const stats = [
@@ -104,18 +111,26 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
                 {/* breakdown of rejected applications */}
                 <div className="w-full max-w-med mt-3 bg-white rounded p-5 pb-5 mb-5">
                     <p className="text-neutral-950 font-bold mb-4 text-center">Rejected Applications Breakdown</p>
+                    {/* After Applied */}
                         <div className="flex justify-between gap-2">
                             <p className="text-stone-600">Rejected after Applied</p>
                             <p className="text-stone-600">{rejectedStageBreakdown.rejectedAfterApplied }</p>
-
                         </div>
+                        {/* After Interview */}
                         <div className="flex justify-between gap-2">
                             <p className="text-stone-600">Rejected after Interview</p>
                             <p className="text-stone-600">{rejectedStageBreakdown.rejectedAfterInterview}</p>
-                           
                         </div>
-                               
-               
+                        {/* Drop off count  */}
+                        <div className="text-slate-600 font-sm ml-5">
+                           {Object.entries(rejectedStageBreakdown.byInterviewStage).map(([stage, count]) => (
+                                <div key={stage} className="flex justify-between">
+                                    <p>{stage}</p>
+                                    <p>{count}</p>
+                                </div>
+                            ))}
+                        </div>
+
                 </div>
             </div>
         </div>

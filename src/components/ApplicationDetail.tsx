@@ -11,12 +11,15 @@ interface JobApplication {
     contact:string;
     referral: string;
     notes:string;
+    rejection_interview_stage?: string | null;
 }
 interface jobDetailProps {
     app:JobApplication
     onCancel: () => void
     onSave:(updatedApp: JobApplication) => void
 }
+
+
 function getStatusColor(status: string){
     switch (status){
         case 'Applied':
@@ -51,6 +54,7 @@ export default function AppDetail(props:jobDetailProps){
     const [contact, setContact] = useState(props.app.contact || "");
     const [referral, setReferral] = useState(props.app.referral || "");
     const [notes, setNotes] = useState(props.app.notes || "");
+    const [rejectionStage, setRejectionStage] = useState(props.app.rejection_interview_stage || "");
 
     const handleSave = (event:React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -65,7 +69,8 @@ export default function AppDetail(props:jobDetailProps){
         applied_date : appliedDate || props.app.applied_date,
         contact,
         referral,
-        notes
+        notes,
+        rejection_interview_stage: status === "Rejected" ? rejectionStage : null
        
 }
     props.onSave(updatedApp);
@@ -83,17 +88,40 @@ export default function AppDetail(props:jobDetailProps){
                 <span className="flex flex-col text-slate-900">
                     <p className="text-slate-500 mb-3">{props.app.position}</p>
                 </span>
-
-                {isEdit ?
+                {/* editing status & where the drop off happened */}
+                {isEdit ? ( 
                 <select value={status} onChange={(e) =>setStatus(e.target.value)} className="w-fit py-1.5 inline-block">
                         <option value="Applied">Applied</option>
                          <option value="Interview">Interview</option>
                          <option value="Offer">Offer</option>
                          <option value="Rejected">Rejected</option>
                 </select>
-                : <span className={`rounded-full w-fit px-3 py-1.5 ${getStatusColor(props.app.status)}`}>{props.app.status}</span>
-                }
+                ):(
+                    <>
+                    <div className="flex items-center gap-2 mt-1">
+                          <span className={`rounded-full w-fit px-3 py-1.5 ${getStatusColor(props.app.status)}`}>{props.app.status}</span>
+                {props.app.status === "Rejected" && props.app.rejection_interview_stage && (
+                    <p className="text-slate-500 text-sm mt-1">Fell off at: {props.app.rejection_interview_stage}</p>
+                )}
+                    </div>
+                   
+                    </>
+               
+                )}
 
+                {isEdit && status === "Rejected" && (
+                    <div className="mt-2">
+                        <p className="text-slate-500">Interview Stage</p>
+                    <select value={rejectionStage} onChange={(e) => setRejectionStage(e.target.value)} className="w-fit py-1.5 inline-block">
+                        <option value="Phone Screen">Phone Screen</option>
+                        <option value="Round 1">Round 1</option>
+                        <option value="Round 2">Round 2</option>
+                        <option value="Round 3">Round 3</option>
+                        <option value="Round 4">Round 4</option>
+                        <option value="Round 5">Round 5</option>
+                    </select>
+                    </div>
+                )}
                 <div className="grid grid-cols-2 gap-3">
                     <span className="flex flex-col text-slate-900">
                         <p className="text-slate-500 mt-6">Location</p>
