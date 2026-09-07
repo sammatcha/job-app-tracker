@@ -1,4 +1,5 @@
 import { useState } from "react"
+import PdfImport from "./PdfImport";
 
 interface JobApplication {
     company: string;
@@ -41,14 +42,27 @@ export default function NewAppForm(props:newAppFormProps){
         notes
     }
     props.onSubmit(newApp);
-    console.log(newApp)
    }
 
    const handleCancel = (event:React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
-
       props.onCancel();
     
+   }
+
+   const handleParsed = (fields: Record<string, string>) => {
+      if (fields.company) setCompany(fields.company)
+      if (fields.location) setLocation(fields.location)
+      if (fields.position) setPosition(fields.position)
+      if (fields.salary) setSalary(fields.salary)
+      if (fields.contact) setContact(fields.contact)
+      if (fields.referral) setReferral(fields.referral)
+      if (fields.notes) setNotes(fields.notes)
+      if (fields.applied_date) setAppliedDate(fields.applied_date)
+      const allowedStatus = ["Applied", "Interview", "Offer", "Rejected"]
+      if (fields.status && allowedStatus.includes(fields.status)) {
+         setStatus(fields.status)
+      }
    }
     return(
         <div className="border p-10 fixed overflow-y-auto inset-0 bg-black/50 z-50">
@@ -57,12 +71,14 @@ export default function NewAppForm(props:newAppFormProps){
                 <div>
                     <h1 className="text-slate-900 text-xl lg:text-2xl">New Job Application</h1>
                 </div>
+                <PdfImport onParsed={handleParsed} />
                 <form className="flex flex-col w-full gap-4 space-x-4 mt-5">
                     <div>
                         <label className="text-slate-900 text-lg">Company</label>
                         <input
                         name="text"
                         type="company"
+                        value={company}
                         onChange={(e) => setCompany(e.target.value)}
                         className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1 focus:ring-2 focus:border-blue-600 "
                         />
@@ -81,6 +97,7 @@ export default function NewAppForm(props:newAppFormProps){
                          <input
                           name="location"
                         type="location"
+                        value={location}
                         onChange={(e) => setLocation(e.target.value)}
                         className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1 focus:ring-2 focus:border-blue-600 "
                          />
@@ -90,6 +107,7 @@ export default function NewAppForm(props:newAppFormProps){
                          <input
                         name="position"
                         type="position"
+                        value={position}
                         onChange={(e) => setPosition(e.target.value)}
                         className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1  focus:ring-2 focus:border-blue-600 "
                          />
@@ -99,6 +117,7 @@ export default function NewAppForm(props:newAppFormProps){
                          <input
                         name="salary"
                         type="salary"
+                        value={salary}
                         onChange={(e) => setSalary(e.target.value)}
                         className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1  focus:ring-2 focus:border-blue-600 "
                          />
@@ -108,6 +127,7 @@ export default function NewAppForm(props:newAppFormProps){
                          <input
                         name="contact"
                         type="contact"
+                        value={contact}
                         onChange={(e) => setContact(e.target.value)}
                         className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1  focus:ring-2 focus:border-blue-600 "
                          />
@@ -125,6 +145,7 @@ export default function NewAppForm(props:newAppFormProps){
                         <label className="text-slate-900">Notes</label>
                          <textarea
                         name="notes"
+                        value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         className="w-full border bg-white border-gray-200 text-slate-700 text-base md:text-lg rounded-md px-2 py-1  focus:ring-2 focus:border-blue-600 "
                          />
