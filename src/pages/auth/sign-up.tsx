@@ -8,13 +8,11 @@ export default function SignUp(){
     const navigate = useNavigate();
 
     const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("sign up starts")
     e.preventDefault();
     const {data, error} = await supabase.auth.signUp({
         email,
         password
     });
-    console.log("sign up response", data)
     if(error){
         console.error("Sign In error:", error.message)
     }else if(data.user){

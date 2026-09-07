@@ -56,7 +56,7 @@ export default function Dashboard(){
        .from('job_applications')
        .insert([newApp]).select();
        if(error){
-        console.log("error inserting db", error.message)
+        console.error("error inserting db", error.message)
        }else{
         setApplications([...applications, data[0]]);
         setShowForm(false);
@@ -70,9 +70,8 @@ export default function Dashboard(){
         const {error} = await supabase.auth.signOut()
 
         if(error){
-            console.log("error signing out", error.message)
+            console.error("error signing out", error.message)
         }else{
-            // console.log("authenticated user", user)
            navigate('/')
         }
     }
@@ -83,7 +82,7 @@ export default function Dashboard(){
         .from('job_applications').select('*')
         
         if(error){
-        console.log("error fetching data", error.message)
+        console.error("error fetching data", error.message)
         }else{
             setApplications(data)
         }
@@ -93,7 +92,7 @@ export default function Dashboard(){
         .select('*')
         
         if(historyError){
-            console.log("error fetching history", historyError.message)
+            console.error("error fetching history", historyError.message)
         }else{
             setStatusHistory(historyData)
         }
@@ -109,7 +108,7 @@ export default function Dashboard(){
         .select()
     
         if(error){
-            console.log("error updating application", error.message)
+            console.error("error updating application", error.message)
             return;
         }
         if(data && data.length > 0) {
@@ -125,7 +124,7 @@ export default function Dashboard(){
                 status: updatedFields.status,
                 user_id: user?.id
             })
-            if (historyError) console.log("error inserting history", historyError.message)
+            if (historyError) console.error("error inserting history", historyError.message)
             if (!historyError){
                 setStatusHistory(prev => [...prev, {
                     application_id: id!,
@@ -144,7 +143,7 @@ export default function Dashboard(){
         const fetchUser = async () => {
             const {data: {user}} = await supabase.auth.getUser()
             if (!user){
-                console.log("error getting user")
+                console.error("error getting user")
             }else{
                 setUser(user)
             }
