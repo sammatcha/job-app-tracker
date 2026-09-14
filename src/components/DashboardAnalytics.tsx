@@ -1,4 +1,5 @@
 import { toPercent } from "../helper/ToPercent";
+import { getInterviewsByMonth } from "../helper/getInterviewsByMonth";
 
 interface JobApplication {
     status: string;
@@ -34,10 +35,8 @@ const getRejectedStageBreakdown = (rejectedIds: number[] , statusHistory: Status
         byInterviewStage[stage]= (byInterviewStage[stage] || 0) + 1;
     } else {
         rejectedAfterApplied++;   
+    }  
     }
-    
-    
-   }
    return { rejectedAfterApplied, rejectedAfterInterview, byInterviewStage };
 }
 
@@ -57,6 +56,11 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
     .filter((id): id is number => id !== undefined);
 
     const rejectedStageBreakdown = getRejectedStageBreakdown(rejectedIds, statusHistory, rejectedApps);
+    const interviewsByMonth = getInterviewsByMonth(statusHistory);
+    const interviewYears = ["2025", "2026"];
+    const monthNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
 
 
     const stats = [
@@ -130,9 +134,32 @@ export default function DashboardAnalytics({ applications, statusHistory}: Dashb
                                 </div>
                             ))}
                         </div>
-
                 </div>
+            </div>
+            <div className="mt-5 bg-white p-5 rounded mb-5">
+                <p className="text-neutral-950 font-bold mb-4">Interviews by month</p>
+                {interviewYears.map((year) => (
+                    <div key={year} className="mb-4 last:mb-0">
+                        <p className="font-bold text-neutral-950 mb-2">{year}</p>
+                        <div className="flex gap-2">
+                            {monthNumbers.map((month) => {
+                                const monthKey = `${year}-${String(month).padStart(2, "0")}`
+                                const hadInterview = Boolean(interviewsByMonth[monthKey])
+                                return (
+                                    <div key={monthKey} className="flex flex-col items-center gap-1">
+                                        <div
+                                            title={`${monthLabels[month - 1]} ${year}`}
+                                            className={`w-3 h-3 rounded-sm ${hadInterview ? "bg-blue-500" : "bg-gray-200"}`}
+                                        />
+                                        <p className="text-[10px] text-stone-500">{monthLabels[month - 1]}</p>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     )
 }
+
