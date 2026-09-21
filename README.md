@@ -4,34 +4,39 @@ A React dashboard for tracking your job applications with pipeline visualization
 ## Screenshots
 
 ### Dashboard Analytics
-<img width="1227" height="422" alt="image" src="https://github.com/user-attachments/assets/5231b08e-a0ed-49f3-801f-db6d6cf1c475" />
+![Dashboard](public/images/dashboard.png)
 
 ### Applications Table
 <img width="1208" height="398" alt="image" src="https://github.com/user-attachments/assets/17301d95-b4ef-4319-8e9d-04b4e7768a0c" />
 
 
 ## Features
+- Upload job posting PDF and Claude autofills application fields
 - Add and manage job applications
 - Pipeline overview with stage breakdown
 - Response rate, interview rate, and offer rate stats
+- Visualize interview activity by month 
 - Demo login with admin credentials
 
   
 ## Tech Stack
-React · TypeScript · Vite · Supabase · Tailwind CSS · Vercel
+React · TypeScript · Vite · Supabase · Tailwind CSS · Vercel· Claude API
 
 ## Getting Started
 
-Install dependencies:
+### Prerequisites
+- Anthropic API key
+- Node.js 18+ (and npm)
+
+
+
+Install dependencies
 ```bash
 npm install
 ```
 
-Run dev server<br>
+### Run
 ```
 npm run dev
 ```
 
-## Why I Built This
-
-I built this to keep job applications organized, track status updates, and better understand where I am in the application process.
