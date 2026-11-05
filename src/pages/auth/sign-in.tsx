@@ -23,6 +23,20 @@ const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
       navigate('/dashboard')
     }
 }
+
+const handleDemoSignIn = async () => {
+    const {data, error} = await supabase.auth.signInWithPassword({
+        email: import.meta.env.VITE_DEMO_EMAIL,
+        password: import.meta.env.VITE_DEMO_PASSWORD
+       
+    });
+     console.log("Demo sign In data:", data)
+    if (error) {
+        console.error("Demo sign In error:", error.message)
+    }else if(data.user){
+        navigate('/dashboard')
+    }
+}
     return(
         <div className="grid mx-auto text-center h-screen px-10 py-5 md:p-20 lg:px-0 lg:py-0">
           <div>
@@ -65,9 +79,15 @@ const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
                 className=" w-full border text-center p-2 rounded border-slate-400 cursor-pointer bg-cornflowerBlue text-white font-bold hover:shadow-lg mb-3">
                       Sign In
                 </button>
-                  
                </div>
-
+               <div className="mb-6">
+                <button type="button"
+                onClick={handleDemoSignIn}
+                className="w-full border text-center p-2 rounded border-slate-400 cursor-pointer outline text-neutral-900 font-bold hover:shadow-lg"
+                >
+                    Continue as Demo User
+                </button>
+               </div>
                <div>
                 <span className="flex text-sm md:text-lg whitespace-nowrap gap-3 text-mutedGray w-full"> 
                     <p className="">Don't have an account yet?</p>
@@ -75,7 +95,6 @@ const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
                    Sign Up
                    </Link>
                 </span>
-               
                </div>
                 
             </form>
