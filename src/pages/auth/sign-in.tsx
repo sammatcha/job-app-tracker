@@ -30,7 +30,6 @@ const handleDemoSignIn = async () => {
         password: import.meta.env.VITE_DEMO_PASSWORD
        
     });
-     console.log("Demo sign In data:", data)
     if (error) {
         console.error("Demo sign In error:", error.message)
     }else if(data.user){
